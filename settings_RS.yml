@@ -1,0 +1,56 @@
+preferences:
+    general:
+        audioLib: PTB
+        units: deg
+
+window:
+    size: [200, 160] #[1920, 1080]
+    pos: [0, 0]
+    color: [186, 186, 186]
+    colorSpace: 'rgb255'
+    fullscr: False
+    winType: pyglet
+    waitBlanking: True
+
+monitor:
+    name: default
+    width: 20 # 60 # 69.8  # in cm
+    distance: 20 # 172.06 # 198 # in cm
+    gamma: 1
+
+operating system: linux
+
+Task settings: 
+    Response interval: [0.1, 1.5] # time in s you allow the participant to respond that still counts as correct response (only relevant for unambiguous stimuli)
+    Stimulus names: ['Left', 'Right']
+    Blocks: 4 # e.g. 4 blocks would mean 2 rivalry and 2 unambiguous (alternated)
+    Blocks practice: 2 # can be interrupted after every block - alternating ambiguous and unambiguous, ambiguous is always first 
+    Previous percept duration: [405, 240, 105, 450, 315, 540, 270, 255, 210, 120, 330, 360] # list with frame values (still to be converted into screenticks!) or int in seconds
+    Percept duration jitter: 0.5 # in sec, NOT USED when list entered above, otherwise added to the previous percept duration (0.1 would be a random UNIFORM jitter between -0.1 and 0.1)
+    Stimulus duration ambiguous: 120 # duration in s
+    Break duration: 5 # duration in s
+    Screenshot: False # makes a screenshot when aborting experiment (only use without a subject!!)
+    Test stimuli: False # boolean
+    Exit key: 'q'
+    Break buttons: 'b'
+    Monitor refreshrate: 60 # in Hz
+    Screentick conversion: 30 # the value used to calculate how many screenticks there are per frame (check Readme for how we use the term 'frame')
+    Test eyetracker: False # boolean
+
+Stimulus settings: 
+    Stimulus path: './stimuli/RS_stimuli/stimuli_186RGB/'
+    Stimulus size: 5
+    Stimulus resolution: 800 # this will be used to load the correct stimulus! Pay attention to the filename format!
+    Break stimulus name : 'fixation_dot'
+    Dot size: 0.02 # same as stimulus resolution!
+    Number frames: 190 # How many images of the globe do we have to complete one full rotation
+    Number dots: 350 # how many dots are in the sphere (should be set in your filename)
+    Sphere number ambiguous: 1 # create multiple spheres with the same parameters without overwriting the existing bmps
+    Sphere number unambiguous: 5
+    Black at back: 0.25 # the following paramter define color of dots and background 
+    White at back: 0.75
+    Black at front: 0
+    White at front: 1
+    Dot size min: 0.012 # size of the dots 
+    Dot size max: 0.028
+
