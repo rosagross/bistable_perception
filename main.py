@@ -12,7 +12,6 @@ import os
 import re
 from datetime import datetime
 from bistable_perception_session import BistablePerceptionSession
-from figure_ground_session import FigureGroundSession
 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 
@@ -36,10 +35,7 @@ def main():
         output_dir = output_dir + datetime.now().strftime('%Y%m%d%H%M%S')
     
     # instantiate and run the session 
-    if task == 'FG':
-        experiment_session = FigureGroundSession(output_str, output_dir, settings_file, subject_ID, eyetracker_on)
-    else:
-        experiment_session = BistablePerceptionSession(output_str, output_dir, settings_file, subject_ID, eyetracker_on, task)
+    experiment_session = BistablePerceptionSession(output_str, output_dir, settings_file, subject_ID, eyetracker_on, task)
     experiment_session.run()
 
 

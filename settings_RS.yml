@@ -4,18 +4,18 @@ preferences:
         units: deg
 
 window:
-    size: [200, 160] #[1920, 1080]
+    size: [1920, 1080]
     pos: [0, 0]
     color: [186, 186, 186]
     colorSpace: 'rgb255'
-    fullscr: False
+    fullscr: True
     winType: pyglet
     waitBlanking: True
 
 monitor:
     name: default
-    width: 20 # 60 # 69.8  # in cm
-    distance: 20 # 172.06 # 198 # in cm
+    width: 69.8  # in cm
+    distance: 198 # in cm
     gamma: 1
 
 operating system: linux
@@ -33,7 +33,7 @@ Task settings:
     Test stimuli: False # boolean
     Exit key: 'q'
     Break buttons: 'b'
-    Monitor refreshrate: 60 # in Hz
+    Monitor refreshrate: 120 # in Hz
     Screentick conversion: 30 # the value used to calculate how many screenticks there are per frame (check Readme for how we use the term 'frame')
     Test eyetracker: False # boolean
 

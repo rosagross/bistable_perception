@@ -8,6 +8,7 @@
 
 import numpy as np
 import os
+import time
 import re
 from datetime import datetime
 from psychopy import visual
@@ -37,6 +38,8 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
             ID of the current participant
         eyetracker_on : bool 
             Determines if the cablibration process is getting started.
+        task : string
+            BR or RS
         """
 
         super().__init__(output_str, output_dir, settings_file, eyetracker_on=eyetracker_on)
@@ -135,6 +138,7 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
                     stimulus_index_list = [stimulus_index]*len(self.amb_phase_dur)
                 
                 elif self.task == 'RS':
+                    print('ambiguous block!')
                     # the rotating globe has no color combination 
                     color_comb = np.NaN
                     # add the fitting stimuli indices to the stimulus list
@@ -144,6 +148,8 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
                         frame_index = (phase_index+1)%self.stimuli.nr_of_frames
                         stimulus_index = self.stimuli.lookup_list.index(f'ambiguous_{frame_index}')
                         stimulus_index_list.append(stimulus_index)
+
+                        print(frame_index)
                 
                 self.trial_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, color_comb, self.amb_phase_dur, 'frames', stimulus_index_list))
                 self.trial_nr += 1 
@@ -160,70 +166,73 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
                     color_comb = self.colors_ambiguous[0] 
                     self.colors_ambiguous = self.colors_ambiguous[1:]
 
-                # create an unambiguous block
-                for i, phase_duration in enumerate(phase_durations_unambiguous):
-                    # determine if next trial shows stimulus 1 or 2
-                    
-                    if self.task == 'BR':
+                    for i, phase_duration in enumerate(phase_durations_unambiguous):
                         trial_type = 'house' if self.trial_nr % 2 == 0 else 'face'
                         # we have to insert the transition period here (except for the last trial)
                         # the trial nr, block ID and block and trial type stay the same as for the previous trial 
                         # get the correct color combination
                         if (trial_type=='house') & (color_comb=='redface'):
                             fading_color = 'hb2fr'
+                            stimulus_color = 'house_blue'
                         elif (trial_type=='face') & (color_comb=='redface'):
                             fading_color = 'fr2hb'
+                            stimulus_color = 'face_red'
                         elif (trial_type=='house') & (color_comb=='redhouse'):
                             fading_color = 'hr2fb'
+                            stimulus_color = 'house_red'
                         else:
                             fading_color = 'fb2hr'
+                            stimulus_color = 'face_blue'
                         
                         fading_index_list = []
-                        for i in len(self.images_per_combi):
+                        for fading_index in range(self.stimuli.images_per_combi):
                             # choose stimulus from list depending on fading color
-                            stimulus_index = self.stimuli.lookup_list.index(fading_color+f'_{i}')
+                            stimulus_index = self.stimuli.lookup_list.index(fading_color+f'_{fading_index}')
                             fading_index_list.append(stimulus_index)
 
-                        if self.nr_fading_stimuli != 0:
-                            unambiguous_stimulus_index = self.stimuli.lookup_list.index(color_comb)
+                        if self.stimuli.nr_fading_stimuli != 0:
+                            unambiguous_stimulus_index = self.stimuli.lookup_list.index(stimulus_color)
                             
                             # cut out the beginning and end of trial because the transition takes time (but the e)
                             if ((i == len(phase_durations_unambiguous)-1) or (i == 0)):
                                 print('last or first')
                                 phase_duration_total = phase_duration - int(self.stimuli.transition_length/2) # in the beginning/end only cut half 
-                                prefading_phases = [self.screenticks_per_frame]*(phase_duration_total/self.screenticks_per_frame)
+                                prefading_phases = [self.screenticks_per_frame]*int(phase_duration_total/self.screenticks_per_frame)
                                 print('phases before fading', prefading_phases)
                                 
                                 stimulus_index_list = [unambiguous_stimulus_index]*len(prefading_phases)
 
                                 # make trial for the period before the fading begins
-                                self.trial_list.append(BPTrial(self, trial_nr, block_ID, block_type, trial_type, color_comb, prefading_phases, 'frames', stimulus_index_list))
+                                self.trial_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, color_comb, prefading_phases, 'frames', stimulus_index_list))
                                 if i == 0:
                                     print('first transition')
                                     print('transition phases', self.transition_phases)
                                     # make fading trial
-                                    self.trial_list.append(BPTrial(self, trial_nr, block_ID, block_type, trial_type, fading_color, self.transition_phases, 'frames', fading_index_list))
+                                    self.trial_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, fading_color, self.transition_phases, 'frames', fading_index_list))
                                 
                             else:
                                 print('phase duration before', phase_duration)
-                                phase_duration_total = phase_duration - self.transition_length
-                                prefading_phases = [self.screenticks_per_frame]*(phase_duration_total/self.screenticks_per_frame)
+                                phase_duration_total = phase_duration - self.stimuli.transition_length
+                                prefading_phases = [self.screenticks_per_frame]*int(phase_duration_total/self.screenticks_per_frame)
                                 stimulus_index_list = [unambiguous_stimulus_index]*len(prefading_phases)
 
-                                self.trial_list.append(BRTrial(self, trial_nr, block_ID, block_type, trial_type, color_comb, prefading_phases, 'frames', stimulus_index_list))
-                                self.trial_list.append(BRTrial(self, trial_nr, block_ID, block_type, trial_type, fading_color, self.transition_phases, 'frames', fading_index_list))
+                                self.trial_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, color_comb, prefading_phases, 'frames', stimulus_index_list))
+                                self.trial_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, fading_color, self.transition_phases, 'frames', fading_index_list))
                                 
                         else:
-                            unambiguous_phases = [self.screenticks_per_frame]*(phase_duration/self.screenticks_per_frame)
+                            unambiguous_phases = [self.screenticks_per_frame]*int(phase_duration/self.screenticks_per_frame)
                             stimulus_index_list = [unambiguous_stimulus_index]*len(unambiguous_phases)
-                            self.trial_list.append(BPTrial(self, trial_nr, block_ID, block_type, trial_type, color_comb, [phase_duration], 'frames', stimulus_index_list))
+                            self.trial_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, color_comb, [phase_duration], 'frames', stimulus_index_list))
+                        self.trial_nr += 1
 
-                    elif self.task == 'RS':
+                elif self.task == 'RS':
 
-                        # create the unambiguous trials 
-                        unambiguous_block = self.create_unambiguous_block(phase_durations_unambiguous, block_ID, block_type)
-                        # .. and append it to the trial list
-                        self.trial_list = [*self.trial_list, *unambiguous_block]
+                    print('create rotating sphere unambiguous!')
+
+                    # create the unambiguous trials 
+                    unambiguous_block = self.create_unambiguous_block(phase_durations_unambiguous, block_ID, block_type)
+                    # .. and append it to the trial list
+                    self.trial_list = [*self.trial_list, *unambiguous_block]
 
 
     def create_stimuli(self):
@@ -283,26 +292,30 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
             nr_phases_unambig = int(stim_duration/self.screenticks_per_frame)
             phase_durations_unambiguous = [self.screenticks_per_frame]*nr_phases_unambig
             
-            # TODO: write function for computing the indice lists! (reocurring snippet..)
-            # loop over the phases
-            stimulus_index_list = []
-            for phase_index in range(len(phase_durations_unambiguous)):
-                frame_index = (phase_index+last_frame_previous+1)%self.stimuli.nr_of_frames
-                stimulus_index = self.stimuli.lookup_list.index(f'ambiguous_{frame_index}')
-                stimulus_index_list.append(stimulus_index)
-
             # the number of phases also tells us which image was the last one, so that
             # the next rotation can start from there
-            last_frame_previous = (last_frame_previous+dummy)%self.nr_of_frames
+            last_frame_previous = (last_frame_previous+dummy)%self.stimuli.nr_of_frames
             if trial_type == 'right':
-                last_frame_previous = self.nr_of_frames - last_frame_previous 
+                last_frame_previous = self.stimuli.nr_of_frames - last_frame_previous 
             elif trial_type == 'left':
-                last_frame_previous = abs(last_frame_previous - self.nr_of_frames)
+                last_frame_previous = abs(last_frame_previous - self.stimuli.nr_of_frames)
             self.trial_nr += 1 
+            
+            # TODO: write function for computing the indice lists! (reocurring snippet..)
+            # get the right stimulus index for the look-up table 
+            stimulus_index_list = []
+            print(trial_type)
+            for phase_index in range(len(phase_durations_unambiguous)):
+                frame_index = (phase_index+last_frame_previous+1)%self.stimuli.nr_of_frames
+                stimulus_index = self.stimuli.lookup_list.index('unambiguous_' + trial_type + f'_{frame_index}')
+                stimulus_index_list.append(stimulus_index)
+                print(frame_index)
+
             block_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, np.NaN, phase_durations_unambiguous,'frames', stimulus_index_list))
             # save old value and update new one
             dummy = last_frame_previous
             last_frame_previous = nr_phases_unambig
+        return block_list
 
 
     def create_duration_array(self):
@@ -342,13 +355,14 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
         print(phase_durations)
         return phase_durations
 
+
     def draw_stimulus(self):
         """
         Depending on what phase we are in, this function draws the apropriate stimulus.
         """
-
         index = self.current_trial.stimulus_index_list[self.current_trial.phase]
         self.stimuli.unique_stimulus_list[index].draw()
+        
 
     def wait_for_yesno(self, text):
         '''
@@ -385,7 +399,9 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
             button_instructions = f'Upper - {self.stimulus_names[1]}\n Lower - {self.stimulus_names[0]}'
         
         self.display_text(button_instructions, keys='space')
-   
+
+        self.display_text('Please wait', keys='t')
+
         # this method actually starts the timer which keeps track of trial onsets
         self.start_experiment()
         self.kb.clock.reset()

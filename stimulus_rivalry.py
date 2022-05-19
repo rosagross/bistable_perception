@@ -32,6 +32,9 @@ class BRStimulus():
         self.nr_fading_stimuli = self.settings['Stimulus settings']['Nr fading stimuli']
         self.transition_length = self.settings['Stimulus settings']['Transition length']
         self.break_stim_name = self.settings['Stimulus settings']['Break stimulus name']
+        self.screentick_conversion = self.settings['Task settings']['Screentick conversion']
+        self.monitor_refreshrate = self.settings['Task settings']['Monitor refreshrate']
+        self.screenticks_per_frame = int(self.monitor_refreshrate/self.screentick_conversion)
         self.win = win
         self.unique_stimulus_list = self.load_stimuli()
         self.lookup_list = self.create_lookup_list()
@@ -63,13 +66,14 @@ class BRStimulus():
         self.fading_blueface_2_redhouse = []
         
         fading_step = 0
-        self.images_per_combi = int(self.nr_fading_stimuli/self.transition_length)
+        self.images_per_combi = int(self.transition_length/self.screenticks_per_frame)
+        transition_step = int(self.nr_fading_stimuli/self.images_per_combi)
         for i in range(self.images_per_combi):
             self.fading_bluehouse_2_redface.append(visual.ImageStim(self.win, image=self.path_to_stim+f'fading/fading_hb2fr_{fading_step}.bmp', units='deg', size=self.stim_size))
             self.fading_redhouse_2_blueface.append(visual.ImageStim(self.win, image=self.path_to_stim+f'fading/fading_hr2fb_{self.nr_fading_stimuli-1-fading_step}.bmp', units='deg', size=self.stim_size))
             self.fading_redface_2_bluehouse.append(visual.ImageStim(self.win, image=self.path_to_stim+f'fading/fading_hb2fr_{self.nr_fading_stimuli-1-fading_step}.bmp', units='deg', size=self.stim_size))
             self.fading_blueface_2_redhouse.append(visual.ImageStim(self.win, image=self.path_to_stim+f'fading/fading_hr2fb_{fading_step}.bmp', units='deg', size=self.stim_size))
-            fading_step += self.transition_length
+            fading_step += transition_step
 
         unique_stimulus_list = [self.house_red, self.house_blue, self.face_red, self.face_blue, self.rivalry_redface, self.rivalry_redhouse, self.fixation_screen] 
         unique_stimulus_list = unique_stimulus_list + self.fading_bluehouse_2_redface + self.fading_redhouse_2_blueface + self.fading_redface_2_bluehouse + self.fading_blueface_2_redhouse
