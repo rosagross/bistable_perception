@@ -1,5 +1,5 @@
 # bistable_perception
-This is an bistable experiment which can be executed in two different settings: **binocular rivarly** or **rotating sphere**. using the rotating sphere illusion to study consciousness and perception of ambiguous stimuli. An eyetracking device (EyeLink) may be connected. 
+This is a bistable experiment which can be executed in two different settings: **binocular rivarly** or **rotating sphere**. using the rotating sphere illusion to study consciousness and perception of ambiguous stimuli. An eyetracking device (EyeLink) may be connected. 
 
 
 **Requirements**
