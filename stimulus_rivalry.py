@@ -75,8 +75,16 @@ class BRStimulus():
             self.fading_blueface_2_redhouse.append(visual.ImageStim(self.win, image=self.path_to_stim+f'fading/fading_hr2fb_{fading_step}.bmp', units='deg', size=self.stim_size))
             fading_step += transition_step
 
+        # load a stimulus that can test the eye tracking data 
+        dots = [visual.Circle(self.win, lineColor='red', units='pix', size=70, pos=[-250,-250]),
+                visual.Circle(self.win, lineColor='red', units='pix', size=70, pos=[250,-250]),
+                visual.Circle(self.win, lineColor='red', units='pix', size=70, pos=[250,250]),
+                visual.Circle(self.win, lineColor='red', units='pix', size=70, pos=[-250,250])]
+
+        self.eye_tracking_test = dots
+
         unique_stimulus_list = [self.house_red, self.house_blue, self.face_red, self.face_blue, self.rivalry_redface, self.rivalry_redhouse, self.fixation_screen] 
-        unique_stimulus_list = unique_stimulus_list + self.fading_bluehouse_2_redface + self.fading_redhouse_2_blueface + self.fading_redface_2_bluehouse + self.fading_blueface_2_redhouse
+        unique_stimulus_list = unique_stimulus_list + self.fading_bluehouse_2_redface + self.fading_redhouse_2_blueface + self.fading_redface_2_bluehouse + self.fading_blueface_2_redhouse + self.eye_tracking_test
         return unique_stimulus_list
 
     def create_lookup_list(self):
@@ -96,7 +104,11 @@ class BRStimulus():
             fr2hb_fading_names.append('fr2hb' + f'_{i}')
             fb2hr_fading_names.append('fb2hr' + f'_{i}')
 
-        lookup_list = stimuli_names + hb2fr_fading_names + hr2fb_fading_names + fr2hb_fading_names + fb2hr_fading_names
+        self.eyetracking_test_names = []
+        for i in range(len(self.eye_tracking_test)):
+            self.eyetracking_test_names.append(f'tracking_test_{i}')
+
+        lookup_list = stimuli_names + hb2fr_fading_names + hr2fb_fading_names + fr2hb_fading_names + fb2hr_fading_names + self.eyetracking_test_names
         
         return lookup_list
 

@@ -111,6 +111,15 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
         Creates the trials with its phase durations and randomization. 
         One trial looks like the following, depending on the block type
         """
+
+        # trial to test the eye tracker and the data analysis (e.g. if positions are measured correctly)
+        if self.test_eyetracker:
+            for d, test_dot in enumerate(self.stimuli.eyetracking_test_names):
+                print(test_dot)
+                index = self.stimuli.lookup_list.index(test_dot)
+                self.trial_list.append(BPTrial(self, 0, 0, 'tracking_test', str(d), 'tracking_test', [5*self.monitor_refreshrate], 'frames', [index]))
+            
+
         self.trial_nr = 1
         
         for i in range(self.n_blocks):  
@@ -149,7 +158,6 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
                         stimulus_index = self.stimuli.lookup_list.index(f'ambiguous_{frame_index}')
                         stimulus_index_list.append(stimulus_index)
 
-                        print(frame_index)
                 
                 self.trial_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, color_comb, self.amb_phase_dur, 'frames', stimulus_index_list))
                 self.trial_nr += 1 
@@ -304,12 +312,10 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
             # TODO: write function for computing the indice lists! (reocurring snippet..)
             # get the right stimulus index for the look-up table 
             stimulus_index_list = []
-            print(trial_type)
             for phase_index in range(len(phase_durations_unambiguous)):
                 frame_index = (phase_index+last_frame_previous+1)%self.stimuli.nr_of_frames
                 stimulus_index = self.stimuli.lookup_list.index('unambiguous_' + trial_type + f'_{frame_index}')
                 stimulus_index_list.append(stimulus_index)
-                print(frame_index)
 
             block_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, np.NaN, phase_durations_unambiguous,'frames', stimulus_index_list))
             # save old value and update new one

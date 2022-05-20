@@ -76,8 +76,16 @@ class RSStimulus():
             self.unambiguous_stim_list_right.append(visual.ImageStim(self.win, image=self.path_to_stim+filename_unamb_right, units='deg', size=self.stim_size))
             # create the left rotation list separately since it takes longer if we do the indices counting backwards later on!
             self.unambiguous_stim_list_left.append(visual.ImageStim(self.win, image=self.path_to_stim+filename_unamb_left, units='deg', size=self.stim_size))
+
+        # load a stimulus that can test the eye tracking data 
+        dots = [visual.Circle(self.win, lineColor='red', units='pix', size=70, pos=[-250,-250]),
+                visual.Circle(self.win, lineColor='red', units='pix', size=70, pos=[250,-250]),
+                visual.Circle(self.win, lineColor='red', units='pix', size=70, pos=[250,250]),
+                visual.Circle(self.win, lineColor='red', units='pix', size=70, pos=[-250,250])]
+
+        self.eye_tracking_test = dots
         
-        unique_stimulus_list = self.ambiguous_stim_list + self.unambiguous_stim_list_left + self.unambiguous_stim_list_right + [self.fixation_dot]
+        unique_stimulus_list = self.ambiguous_stim_list + self.unambiguous_stim_list_left + self.unambiguous_stim_list_right + [self.fixation_dot] + self.eye_tracking_test
         return unique_stimulus_list
 
 
@@ -98,7 +106,11 @@ class RSStimulus():
             unambiguous_left_names.append('unambiguous_left' + f'_{i}')
             unambiguous_right_names.append('unambiguous_right' + f'_{i}')
 
-        lookup_list = ambiguous_names + unambiguous_left_names + unambiguous_right_names + [self.break_stim_name]
+        self.eyetracking_test_names = []
+        for i in range(len(self.eye_tracking_test)):
+            self.eyetracking_test_names.append(f'tracking_test_{i}')
+
+        lookup_list = ambiguous_names + unambiguous_left_names + unambiguous_right_names + [self.break_stim_name] + self.eyetracking_test_names
         return lookup_list
 
     

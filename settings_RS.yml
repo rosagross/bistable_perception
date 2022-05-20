@@ -29,13 +29,13 @@ Task settings:
     Percept duration jitter: 0.5 # in sec, NOT USED when list entered above, otherwise added to the previous percept duration (0.1 would be a random UNIFORM jitter between -0.1 and 0.1)
     Stimulus duration ambiguous: 120 # duration in s
     Break duration: 5 # duration in s
-    Screenshot: False # makes a screenshot when aborting experiment (only use without a subject!!)
+    Screenshot: True # makes a screenshot when aborting experiment (only use without a subject!!)
     Test stimuli: False # boolean
     Exit key: 'q'
     Break buttons: 'b'
     Monitor refreshrate: 120 # in Hz
     Screentick conversion: 30 # the value used to calculate how many screenticks there are per frame (check Readme for how we use the term 'frame')
-    Test eyetracker: False # boolean
+    Test eyetracker: True # boolean
 
 Stimulus settings: 
     Stimulus path: './stimuli/RS_stimuli/stimuli_186RGB/'

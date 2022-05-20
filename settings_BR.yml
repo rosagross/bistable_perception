@@ -26,7 +26,7 @@ Task settings:
     Blocks practice: 2 # can be interrupted after every block 
     Previous percept duration: 4 # list with frame values (still to be converted into screenticks!) or int in seconds
     Percept duration jitter: 0.1 # in s, added to the previous percept duration (0.1 would be a random UNIFORM jitter between -0.1 and 0.1)
-    Stimulus duration ambiguous: 50 # 120 (2mins) duration in s
+    Stimulus duration ambiguous:  120 # 120 (2mins) duration in s
     Break duration: 2 # duration in s
     Screenshot: False # makes a screenshot when aborting experiment (only use without a subject!!)
     Test stimuli: False
