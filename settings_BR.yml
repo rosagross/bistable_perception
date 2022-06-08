@@ -24,10 +24,11 @@ Task settings:
     Stimulus names: ['House', 'Face'] # order does not matter. In the log file the reponse button indicates which one is upper or lower button
     Blocks: 4 # e.g. 4 blocks would mean 2 rivalry and 2 unambiguous (alternated)
     Blocks practice: 2 # can be interrupted after every block 
-    Previous percept duration: 4 # list with frame values (still to be converted into screenticks!) or int in seconds
+    Previous percept duration: [[388, 905, 431, 835, 349, 129, 162, 409], [115, 177, 112, 121, 545, 864, 623,  47, 552, 323,  55,  15,  57]] # list with frame values (not screenticks!) or int in seconds
     Percept duration jitter: 0.1 # in s, added to the previous percept duration (0.1 would be a random UNIFORM jitter between -0.1 and 0.1)
     Stimulus duration ambiguous:  120 # 120 (2mins) duration in s
-    Break duration: 2 # duration in s
+    Break duration: 5 # duration in s
+    Fixation duration: 2 # duration in s
     Screenshot: False # makes a screenshot when aborting experiment (only use without a subject!!)
     Test stimuli: False
     Exit key: 'q'
@@ -41,5 +42,6 @@ Stimulus settings:
     Stimulus path: './stimuli/BR_stimuli/'
     Stimulus size: 10 # stimulus size in degrees (INCLUDING FIXATION!)
     Nr fading stimuli: 255
-    Transition length: 40 # in frames (note, still to be converted into screen ticks!)
-    Break stimulus name : 'fixation_screen'
+    Transition length: 20 # in frames (note, still to be converted into screen ticks!)
+    Fixation stimulus name : 'fixation_screen'
+    Break stimulus name : 'button_instructions'

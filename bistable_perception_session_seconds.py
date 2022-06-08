@@ -56,12 +56,14 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
         self.n_practice_blocks = self.settings['Task settings']['Blocks practice']         
         self.response_interval = self.settings['Task settings']['Response interval']
         self.break_duration = self.settings['Task settings']['Break duration']
+        self.fixation_duration = self.settings['Task settings']['Fixation duration']
         self.exit_key = self.settings['Task settings']['Exit key']
         self.break_buttons = self.settings['Task settings']['Break buttons'] 
         self.monitor_refreshrate = self.settings['Task settings']['Monitor refreshrate']
         self.screentick_conversion = self.settings['Task settings']['Screentick conversion']
         self.test_eyetracker = self.settings['Task settings']['Test eyetracker']
         self.break_stim_name = self.settings['Stimulus settings']['Break stimulus name']
+        self.fixation_stim_name = self.settings['Stimulus settings']['Fixation stimulus name']
         
 
         if self.settings['Task settings']['Screenshot']==True:
@@ -77,8 +79,11 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
         # randomly choose if the participant responds with the right BUTTON to stimulus 1 or 2
         if random.uniform(1,100) < 50:
             self.response_button = 'upper_stim1'
+            self.button_instructions = f'Upper - {self.stimulus_names[0]}\n Lower - {self.stimulus_names[1]}'
         else:
             self.response_button = 'upper_stim2'
+            self.button_instructions = f'Upper - {self.stimulus_names[1]}\n Lower - {self.stimulus_names[0]}'
+            
 
         # initialize the keyboard for the button presses
         self.kb = keyboard.Keyboard()
@@ -97,11 +102,13 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
         # ambiguous phase durations 
         self.amb_phase_dur = [self.seconds_per_frame]*int(self.stim_dur_ambiguous/self.seconds_per_frame)
         self.break_phase_durations = [self.seconds_per_frame]*int(self.break_duration/self.seconds_per_frame)
+        self.fixation_phase_durations = [self.seconds_per_frame]*int(self.fixation_duration/self.seconds_per_frame)
 
         # define which condition starts (equal subjects are 0, unequal 1)
         # either start with ambiguous or unambiguous 
         self.start_condition = 0 if self.subject_ID % 2 == 0 else 1 
 
+        
         # make all the trials beforehand and load experiment specific stimuli
         self.create_stimuli()        
         self.create_trials()
@@ -130,8 +137,8 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
             print("\ncurrent block is", block_ID)
             print("start condition", self.start_condition)
             
-            # start off with a break
-            self.trial_list.append(BPTrial(self, 0, block_ID, 'break', 'break', 'break', self.break_phase_durations, 'seconds', self.stimulus_index_list_break))
+            # start off with a fixation break
+            self.trial_list.append(BPTrial(self, 0, block_ID, 'fixation', 'fixation', 'fixation', self.fixation_phase_durations, 'seconds', self.stimulus_index_list_fixation))
             
             # equal subjects start with rivarly, unequal with unambiguous
             if (block_ID + self.start_condition) % 2 == 0:
@@ -246,6 +253,11 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
                     self.trial_list = [*self.trial_list, *unambiguous_block]
                 block_ID_unambiguous += 1
 
+            if i < self.n_blocks:
+                # make a longer break to show button presses again
+                self.trial_list.append(BPTrial(self, 0, block_ID, 'break', 'break', 'break', self.break_phase_durations, 'seconds', self.stimulus_index_list_break))
+            
+
 
     def create_stimuli(self):
        
@@ -253,7 +265,7 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
         if self.task == 'BR':
 
             # create an experiment specific stimulus object, which creates a list of all unique stimuli
-            self.stimuli = BRStimulus(self.settings, self.win)
+            self.stimuli = BRStimulus(self.settings, self.win, self.button_instructions)
 
             # build an array with the possible color combinations 
             # (has to be done BEFORE we construct the trials below)
@@ -274,7 +286,7 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
             self.transition_phases = [self.seconds_per_frame]*int(self.stimuli.transition_length)
 
         elif self.task == 'RS':
-            self.stimuli = RSStimulus(self.settings, self.win)
+            self.stimuli = RSStimulus(self.settings, self.win, self.button_instructions)
         
         else:    
             print('Invalid experiment ID entered!')
@@ -283,6 +295,8 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
         # get the stimulus index for the breaks
         stimulus_index_break = self.stimuli.lookup_list.index(self.break_stim_name)
         self.stimulus_index_list_break = [stimulus_index_break]*len(self.break_phase_durations)
+        stimulus_index_fixation = self.stimuli.lookup_list.index(self.fixation_stim_name)
+        self.stimulus_index_list_fixation = [stimulus_index_fixation]*len(self.fixation_phase_durations)
 
 
     def create_unambiguous_block(self, stim_duration_list, block_ID, block_type):
@@ -406,13 +420,8 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
         if self.eyetracker_on:
             self.calibrate_eyetracker()
             self.start_recording_eyetracker()
-
-        if self.response_button == 'upper_stim1':
-            button_instructions = f'Upper - {self.stimulus_names[0]}\n Lower - {self.stimulus_names[1]}'
-        else:
-            button_instructions = f'Upper - {self.stimulus_names[1]}\n Lower - {self.stimulus_names[0]}'
         
-        self.display_text(button_instructions, keys='space')
+        self.display_text(self.button_instructions, keys='space')
 
         self.display_text('Please wait', keys='t')
 
