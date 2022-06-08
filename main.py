@@ -11,7 +11,7 @@ import sys
 import os
 import re
 from datetime import datetime
-from bistable_perception_session import BistablePerceptionSession
+from bistable_perception_session_seconds import BistablePerceptionSession
 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 
