@@ -25,13 +25,14 @@ class RSStimulus():
     This safes us if-statements in the refresh loop
     """
 
-    def __init__(self, settings, win, *args, **kwargs):
+    def __init__(self, settings, win, button_instructions, *args, **kwargs):
         
         # setting for loading the correct stimulus
         self.settings = settings
         self.path_to_stim = self.settings['Stimulus settings']['Stimulus path']
         self.stim_size = self.stim_size = self.settings['Stimulus settings']['Stimulus size']
         self.break_stim_name = self.settings['Stimulus settings']['Break stimulus name']
+        self.fixation_stim_name = self.settings['Stimulus settings']['Fixation stimulus name']
         self.path_to_stim = self.settings['Stimulus settings']['Stimulus path']
         self.stimulus_resolution = self.settings['Stimulus settings']['Stimulus resolution']
         self.dot_size = self.settings['Stimulus settings']['Dot size']
@@ -46,6 +47,7 @@ class RSStimulus():
         self.dot_size_min = self.settings['Stimulus settings']['Dot size min'] 
         self.dot_size_max = self.settings['Stimulus settings']['Dot size max'] 
         self.win = win
+        self.button_instructions = button_instructions
         self.unique_stimulus_list = self.load_stimuli()
         self.lookup_list = self.create_lookup_list()
 
@@ -84,8 +86,12 @@ class RSStimulus():
                 visual.Circle(self.win, lineColor='red', units='pix', size=70, pos=[-250,250])]
 
         self.eye_tracking_test = dots
+
+        # for the break 
+        text = self.button_instructions
+        self.break_stim = visual.TextStim(self.win, text=text)
         
-        unique_stimulus_list = self.ambiguous_stim_list + self.unambiguous_stim_list_left + self.unambiguous_stim_list_right + [self.fixation_dot] + self.eye_tracking_test
+        unique_stimulus_list = self.ambiguous_stim_list + self.unambiguous_stim_list_left + self.unambiguous_stim_list_right + [self.break_stim] + [self.fixation_dot] + self.eye_tracking_test
         return unique_stimulus_list
 
 
@@ -110,7 +116,7 @@ class RSStimulus():
         for i in range(len(self.eye_tracking_test)):
             self.eyetracking_test_names.append(f'tracking_test_{i}')
 
-        lookup_list = ambiguous_names + unambiguous_left_names + unambiguous_right_names + [self.break_stim_name] + self.eyetracking_test_names
+        lookup_list = ambiguous_names + unambiguous_left_names + unambiguous_right_names + [self.break_stim_name] + [self.fixation_stim_name] + self.eyetracking_test_names
         return lookup_list
 
     

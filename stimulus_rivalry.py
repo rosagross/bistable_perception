@@ -20,10 +20,10 @@ class BRStimulus():
     - unambiguous (left or right wards moving)
     - ambiguous (not clear which direction), in this trial, nothing changes over the whole duration of the trial
 
-    Every trial begins with a 10s break.
+    Every trial begins with a short fixation period
     """
 
-    def __init__(self, settings, win, *args, **kwargs):
+    def __init__(self, settings, win, button_instructions, *args, **kwargs):
         
         # setting for loading the correct stimulus
         self.settings = settings
@@ -32,10 +32,12 @@ class BRStimulus():
         self.nr_fading_stimuli = self.settings['Stimulus settings']['Nr fading stimuli']
         self.transition_length = self.settings['Stimulus settings']['Transition length']
         self.break_stim_name = self.settings['Stimulus settings']['Break stimulus name']
+        self.fixation_stim_name = self.settings['Stimulus settings']['Fixation stimulus name']
         self.screentick_conversion = self.settings['Task settings']['Screentick conversion']
         self.monitor_refreshrate = self.settings['Task settings']['Monitor refreshrate']
         self.screenticks_per_frame = int(self.monitor_refreshrate/self.screentick_conversion)
         self.win = win
+        self.button_instructions = button_instructions
         self.unique_stimulus_list = self.load_stimuli()
         self.lookup_list = self.create_lookup_list()
 
@@ -64,9 +66,12 @@ class BRStimulus():
         self.fading_redhouse_2_blueface = []
         self.fading_redface_2_bluehouse = []
         self.fading_blueface_2_redhouse = []
+        # for the break 
+        text = self.button_instructions
+        self.break_stim = visual.TextStim(self.win, text=text)
         
         fading_step = 0
-        self.images_per_combi = int(self.transition_length/self.screenticks_per_frame)
+        self.images_per_combi = int(self.transition_length)
         transition_step = int(self.nr_fading_stimuli/self.images_per_combi)
         for i in range(self.images_per_combi):
             self.fading_bluehouse_2_redface.append(visual.ImageStim(self.win, image=self.path_to_stim+f'fading/fading_hb2fr_{fading_step}.bmp', units='deg', size=self.stim_size))
@@ -83,8 +88,8 @@ class BRStimulus():
 
         self.eye_tracking_test = dots
 
-        unique_stimulus_list = [self.house_red, self.house_blue, self.face_red, self.face_blue, self.rivalry_redface, self.rivalry_redhouse, self.fixation_screen] 
-        unique_stimulus_list = unique_stimulus_list + self.fading_bluehouse_2_redface + self.fading_redhouse_2_blueface + self.fading_redface_2_bluehouse + self.fading_blueface_2_redhouse + self.eye_tracking_test
+        unique_stimulus_list = [self.house_red, self.house_blue, self.face_red, self.face_blue, self.rivalry_redface, self.rivalry_redhouse, self.fixation_screen, self.break_stim] 
+        unique_stimulus_list = unique_stimulus_list + self.fading_bluehouse_2_redface + self.fading_redhouse_2_blueface + self.fading_redface_2_bluehouse + self.fading_blueface_2_redhouse + self.eye_tracking_test 
         return unique_stimulus_list
 
     def create_lookup_list(self):
@@ -92,7 +97,7 @@ class BRStimulus():
         # rivalry stimuli 5-7
         # fixation screen 8
         # fading stimuli 9-end
-        stimuli_names = ['house_red', 'house_blue', 'face_red', 'face_blue', 'rivalry_redface', 'rivalry_redhouse', 'fixation_screen']
+        stimuli_names = ['house_red', 'house_blue', 'face_red', 'face_blue', 'rivalry_redface', 'rivalry_redhouse', self.fixation_stim_name, self.break_stim_name]
         hb2fr_fading_names = []
         hr2fb_fading_names = []
         fr2hb_fading_names = []

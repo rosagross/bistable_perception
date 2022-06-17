@@ -205,7 +205,7 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
                             if ((i == len(phase_durations_unambiguous)-1) or (i == 0)):
                                 print('last or first')
                                 phase_duration_total = phase_duration - int(self.stimuli.transition_length/2) # in the beginning/end only cut half 
-                                prefading_phases = [self.screenticks_per_frame]*int(phase_duration_total/self.screenticks_per_frame)
+                                prefading_phases = [self.screenticks_per_frame]*int(phase_duration_total)
                                 print('phases before fading', prefading_phases)
                                 
                                 stimulus_index_list = [unambiguous_stimulus_index]*len(prefading_phases)
@@ -221,14 +221,14 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
                             else:
                                 print('phase duration before', phase_duration)
                                 phase_duration_total = phase_duration - self.stimuli.transition_length
-                                prefading_phases = [self.screenticks_per_frame]*int(phase_duration_total/self.screenticks_per_frame)
+                                prefading_phases = [self.screenticks_per_frame]*int(phase_duration_total)
                                 stimulus_index_list = [unambiguous_stimulus_index]*len(prefading_phases)
 
                                 self.trial_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, color_comb, prefading_phases, 'frames', stimulus_index_list))
                                 self.trial_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, fading_color, self.transition_phases, 'frames', fading_index_list))
                                 
                         else:
-                            unambiguous_phases = [self.screenticks_per_frame]*int(phase_duration/self.screenticks_per_frame)
+                            unambiguous_phases = [self.screenticks_per_frame]*int(phase_duration)
                             stimulus_index_list = [unambiguous_stimulus_index]*len(unambiguous_phases)
                             self.trial_list.append(BPTrial(self, self.trial_nr, block_ID, block_type, trial_type, color_comb, [phase_duration], 'frames', stimulus_index_list))
                         self.trial_nr += 1
@@ -249,7 +249,7 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
         if self.task == 'BR':
 
             # create an experiment specific stimulus object, which creates a list of all unique stimuli
-            self.stimuli = BRStimulus(self.settings, self.win)
+            self.stimuli = BRStimulus(self.settings, self.win, self.button_instructions)
 
             # build an array with the possible color combinations 
             # (has to be done BEFORE we construct the trials below)
@@ -297,7 +297,7 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
             trial_type = 'right' if self.trial_nr % 2 == 0 else 'left'
 
             # create the phase durations depending on the duration of the stimulus
-            nr_phases_unambig = int(stim_duration/self.screenticks_per_frame)
+            nr_phases_unambig = int(stim_duration)
             phase_durations_unambiguous = [self.screenticks_per_frame]*nr_phases_unambig
             
             # the number of phases also tells us which image was the last one, so that
@@ -400,11 +400,11 @@ class BistablePerceptionSession(PylinkEyetrackerSession):
             self.start_recording_eyetracker()
 
         if self.response_button == 'upper_stim1':
-            button_instructions = f'Upper - {self.stimulus_names[0]}\n Lower - {self.stimulus_names[1]}'
+            self.button_instructions = f'Upper - {self.stimulus_names[0]}\n Lower - {self.stimulus_names[1]}'
         else:
-            button_instructions = f'Upper - {self.stimulus_names[1]}\n Lower - {self.stimulus_names[0]}'
+            self.button_instructions = f'Upper - {self.stimulus_names[1]}\n Lower - {self.stimulus_names[0]}'
         
-        self.display_text(button_instructions, keys='space')
+        self.display_text(self.button_instructions, keys='space')
 
         self.display_text('Please wait', keys='t')
 
